@@ -81,7 +81,7 @@ public class Items {
         for(int i = 0; i<len; i++){
             if(items[i].price<=lowestPrice){
                lowestPrice = items[i].price;
-               lowestQuantity = items[i].quantity;
+               lowestQuantity = items[i].quantityOrEnchant;
                lowestTime = items[i].time;
             }
         }
@@ -101,7 +101,7 @@ public class Items {
         for(int i = 0; i<len; i++){
             if(items[i].price>=highestPrice){
                 highestPrice = items[i].price;
-                highestQuantity = items[i].quantity;
+                highestQuantity = items[i].quantityOrEnchant;
                 highestTime = items[i].time;
             }
         }
@@ -123,6 +123,10 @@ public class Items {
         len = tr.size();
         items = new Item[len];
 
+        if(sell.select("thead").select("th").eq(2).text().equals("Мод.")){
+            enchant = 0;
+        }
+
         for(int i = 0; i<len; i++){
             int j = Integer.parseInt(tr.eq(i).select(".right").eq(0).attr("order"));      //цена
             int k;
@@ -134,14 +138,18 @@ public class Items {
                 k = Integer.parseInt(tr.eq(i).select(".right").eq(1).attr("order"));      //количество
             }
 
-            if(sell.select("thead").select("th").eq(3).text().equals("Мод.")){
-                System.out.println("mod found");
+            int n = enchant;
 
+            if(enchant!=-1 && !tr.eq(i).select(".right").eq(1).attr("order").equals("0")){
+                enchant = 1;
             }
+
+
 
             String l = tr.eq(i).select("td").eq(m).text();                                           //дата
 
-            items[i] = new Item(j, k, l);
+
+            items[i] = new Item(j, k, l, n);
         }
     }
 
@@ -161,8 +169,8 @@ public class Items {
 
         for(int i = 0; i<len; i++){
             if(items[i].price<maxPrice){
-                System.out.println(String.format("Демпинг: %s - %s Аден - %d штук - %s", name , myFormat.format(items[i].price), items[i].quantity, items[i].time));
-                res.add(String.format("Демпинг: %s - %s Аден - %d штук - %s", name, myFormat.format(items[i].price), items[i].quantity, items[i].time));
+                System.out.println(String.format("Демпинг: %s - %s Аден%s - %s", name , myFormat.format(items[i].price), items[i].quantityOrEnchantStr, items[i].time));
+                res.add(String.format("Демпинг: %s - %s Аден%s - %s", name, myFormat.format(items[i].price), items[i].quantityOrEnchantStr, items[i].time));
 
 
             }
@@ -172,13 +180,27 @@ public class Items {
 
     public class Item{
         public int price;
-        public int quantity;
+        public int quantityOrEnchant;
         public String time;
+        public int enchant;
+        public String quantityOrEnchantStr;
 
-        public Item(int i, int j, String k){
-            price = i;
-            quantity = j;
-            time = k;
+
+        public Item(int priceIn, int quantityIn, String timeIn, int enchantIn){
+            price = priceIn;
+            quantityOrEnchant = quantityIn;
+            time = timeIn;
+            enchant = enchantIn;
+
+            if(enchant==-1){
+                quantityOrEnchantStr = String.format(" - %d штук", quantityOrEnchant);
+            } else if(enchant==0){
+                quantityOrEnchantStr = "";
+            } else if(enchant==1){
+                quantityOrEnchantStr = String.format(" - +%d", quantityOrEnchant);
+            }
+
+
         }
 
 
