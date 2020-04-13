@@ -19,11 +19,11 @@ public class Items {
     Item[] items;
     String result;
     int lowestPrice;
-    int lowestQuantity;
+    String lowestQuantity;
     int enchant;
     String lowestTime;
     int highestPrice;
-    int highestQuantity;
+    String highestQuantity;
     String highestTime;
     int len;
 
@@ -65,7 +65,13 @@ public class Items {
                     .cookie("auth", "token")
                     .timeout(5000)
                     .post();
-            name = doc.select("h1").text();
+
+            name = doc.select("h1").textNodes().get(0).text();
+            if(!doc.select("h1").select("span").isEmpty()){
+                name +=doc.select("h1").select("span").eq(0).text();
+            }
+
+
             enchant = -1;
         } catch (
                 IOException e) {
@@ -78,17 +84,23 @@ public class Items {
         clearItems();
         addItems("#group_sell");
         lowestPrice = 2147000000;
+        String newName = name;
         for(int i = 0; i<len; i++){
+
             if(items[i].price<=lowestPrice){
+                if(enchant == 1){
+                    newName = name + " +" + items[i].quantityOrEnchant;
+                }
                lowestPrice = items[i].price;
-               lowestQuantity = items[i].quantityOrEnchant;
+               lowestQuantity = items[i].quantityOrEnchantStr;
                lowestTime = items[i].time;
             }
         }
 
         if(lowestPrice != 2147000000) {
-            System.out.println(String.format("Продажа: %s - %s Аден - %d штук - %s", name, myFormat.format(lowestPrice), lowestQuantity, lowestTime));
-            return (String.format("Продажа: %s - %s Аден - %d штук - %s", name, myFormat.format(lowestPrice), lowestQuantity, lowestTime));
+
+            System.out.println(String.format("Продажа: %s - %s Аден%s - %s", newName, myFormat.format(lowestPrice), lowestQuantity, lowestTime));
+            return (String.format("Продажа: %s - %s Аден%s - %s", name, myFormat.format(lowestPrice), lowestQuantity, lowestTime));
         } else return("");
 
     }
@@ -98,17 +110,21 @@ public class Items {
         clearItems();
         addItems("#group_buy");
         highestPrice = 0;
+        String newName = name;
         for(int i = 0; i<len; i++){
             if(items[i].price>=highestPrice){
+                if(enchant == 1){
+                    newName = name + " +" + items[i].quantityOrEnchant;
+                }
                 highestPrice = items[i].price;
-                highestQuantity = items[i].quantityOrEnchant;
+                highestQuantity = items[i].quantityOrEnchantStr;
                 highestTime = items[i].time;
             }
         }
 
         if(highestPrice != 0) {
-            System.out.println(String.format("Покупка: %s - %s Аден - %d штук - %s", name , myFormat.format(highestPrice), highestQuantity, highestTime));
-            return (String.format("Покупка: %s - %s Аден - %d штук - %s", name , myFormat.format(highestPrice), highestQuantity, highestTime));
+            System.out.println(String.format("Покупка: %s - %s Аден%s - %s", newName , myFormat.format(highestPrice), highestQuantity, highestTime));
+            return (String.format("Покупка: %s - %s Аден%s - %s", newName , myFormat.format(highestPrice), highestQuantity, highestTime));
         } else return("");
 
     }
@@ -166,11 +182,16 @@ public class Items {
         addItems("#group_sell");
 
         ArrayList<String> res = new ArrayList<String>();
-
+        String newName = name;
         for(int i = 0; i<len; i++){
+
             if(items[i].price<maxPrice){
-                System.out.println(String.format("Демпинг: %s - %s Аден%s - %s", name , myFormat.format(items[i].price), items[i].quantityOrEnchantStr, items[i].time));
-                res.add(String.format("Демпинг: %s - %s Аден%s - %s", name, myFormat.format(items[i].price), items[i].quantityOrEnchantStr, items[i].time));
+                if(enchant == 1){
+                    newName = name + " +" + items[i].quantityOrEnchant;
+                }
+
+                System.out.println(String.format("Демпинг: %s - %s Аден%s - %s", newName , myFormat.format(items[i].price), items[i].quantityOrEnchantStr, items[i].time));
+                res.add(String.format("Демпинг: %s - %s Аден%s - %s", newName, myFormat.format(items[i].price), items[i].quantityOrEnchantStr, items[i].time));
 
 
             }
@@ -194,11 +215,16 @@ public class Items {
 
             if(enchant==-1){
                 quantityOrEnchantStr = String.format(" - %d штук", quantityOrEnchant);
+                if (quantityOrEnchant==1){
+                    quantityOrEnchantStr = "";
+                }
             } else if(enchant==0){
                 quantityOrEnchantStr = "";
             } else if(enchant==1){
-                quantityOrEnchantStr = String.format(" - +%d", quantityOrEnchant);
+                quantityOrEnchantStr = "";
             }
+
+
 
 
         }
