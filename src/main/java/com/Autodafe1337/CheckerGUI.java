@@ -46,6 +46,10 @@ public class CheckerGUI extends JFrame implements ActionListener {
         }
     }
 
+    public void clearText(){
+        textArea.setText("");
+    }
+
     public void addText(String[] res){
         try {
             for (String str : res) {
