@@ -30,31 +30,23 @@ public class Items {
     public Items(String itemID){
         result = "";
         connect(itemID);
-        myFormat = NumberFormat.getInstance();
-        myFormat.setGroupingUsed(true);
     }
 
     public Items(int itemID){
         result = "";
         connect(Integer.toString(itemID));
-        myFormat = NumberFormat.getInstance();
-        myFormat.setGroupingUsed(true);
     }
 
     public Items(String itemID, String nameIn){
         result = "";
         connect(itemID);
         name = nameIn;
-        myFormat = NumberFormat.getInstance();
-        myFormat.setGroupingUsed(true);
     }
 
     public Items(int itemID, String nameIn){
         result = "";
         connect(Integer.toString(itemID));
         name = nameIn;
-        myFormat = NumberFormat.getInstance();
-        myFormat.setGroupingUsed(true);
     }
 
     public void connect(String itemID){
@@ -63,7 +55,7 @@ public class Items {
                     .data("query", "Java")
                     .userAgent("Mozilla")
                     .cookie("auth", "token")
-                    .timeout(5000)
+                    .timeout(60000)
                     .post();
 
             name = doc.select("h1").textNodes().get(0).text();
@@ -77,6 +69,8 @@ public class Items {
                 IOException e) {
             e.printStackTrace();
         }
+        myFormat = NumberFormat.getInstance();
+        myFormat.setGroupingUsed(true);
     }
 
     public String getLowestPrice(){
@@ -86,15 +80,16 @@ public class Items {
         lowestPrice = 2147000000;
         String newName = name;
         for(int i = 0; i<len; i++){
-
-            if(items[i].price<=lowestPrice){
-                if(enchant == 1){
-                    newName = name + " +" + items[i].quantityOrEnchant;
+            try {
+                if (items[i].price <= lowestPrice) {
+                    if (enchant == 1) {
+                        newName = name + " +" + items[i].quantityOrEnchant;
+                    }
+                    lowestPrice = items[i].price;
+                    lowestQuantity = items[i].quantityOrEnchantStr;
+                    lowestTime = items[i].time;
                 }
-               lowestPrice = items[i].price;
-               lowestQuantity = items[i].quantityOrEnchantStr;
-               lowestTime = items[i].time;
-            }
+            } catch(NullPointerException ignored){}
         }
 
         if(lowestPrice != 2147000000) {
@@ -112,14 +107,18 @@ public class Items {
         highestPrice = 0;
         String newName = name;
         for(int i = 0; i<len; i++){
-            if(items[i].price>=highestPrice){
-                if(enchant == 1){
-                    newName = name + " +" + items[i].quantityOrEnchant;
+            try {
+
+
+                if (items[i].price >= highestPrice) {
+                    if (enchant == 1) {
+                        newName = name + " +" + items[i].quantityOrEnchant;
+                    }
+                    highestPrice = items[i].price;
+                    highestQuantity = items[i].quantityOrEnchantStr;
+                    highestTime = items[i].time;
                 }
-                highestPrice = items[i].price;
-                highestQuantity = items[i].quantityOrEnchantStr;
-                highestTime = items[i].time;
-            }
+            }catch (NullPointerException ignored){}
         }
 
         if(highestPrice != 0) {
@@ -144,15 +143,24 @@ public class Items {
         }
 
         for(int i = 0; i<len; i++){
-            int j = Integer.parseInt(tr.eq(i).select(".right").eq(0).attr("order"));      //цена
-            int k;
+
             int m = 3;
+
+            int k;
             if(tr.eq(i).select(".right").eq(1).isEmpty()){
                 k = 1;
                 m = 2;
             }else{
                 k = Integer.parseInt(tr.eq(i).select(".right").eq(1).attr("order"));      //количество
             }
+
+            String l = tr.eq(i).select("td").eq(m).text();                                           //дата
+            if(l.equals("2 часа назад")||l.equals("1 час назад")){
+                continue;
+            }
+            int j = Integer.parseInt(tr.eq(i).select(".right").eq(0).attr("order"));      //цена
+
+
 
             int n = enchant;
 
@@ -162,7 +170,7 @@ public class Items {
 
 
 
-            String l = tr.eq(i).select("td").eq(m).text();                                           //дата
+
 
 
             items[i] = new Item(j, k, l, n);
@@ -184,17 +192,16 @@ public class Items {
         ArrayList<String> res = new ArrayList<String>();
         String newName = name;
         for(int i = 0; i<len; i++){
+            try {
+                if (items[i].price < maxPrice) {
+                    if (enchant == 1) {
+                        newName = name + " +" + items[i].quantityOrEnchant;
+                    }
 
-            if(items[i].price<maxPrice){
-                if(enchant == 1){
-                    newName = name + " +" + items[i].quantityOrEnchant;
+                    System.out.println(String.format("Демпинг: %s - %s Аден%s - %s", newName, myFormat.format(items[i].price), items[i].quantityOrEnchantStr, items[i].time));
+                    res.add(String.format("Демпинг: %s - %s Аден%s - %s", newName, myFormat.format(items[i].price), items[i].quantityOrEnchantStr, items[i].time));
                 }
-
-                System.out.println(String.format("Демпинг: %s - %s Аден%s - %s", newName , myFormat.format(items[i].price), items[i].quantityOrEnchantStr, items[i].time));
-                res.add(String.format("Демпинг: %s - %s Аден%s - %s", newName, myFormat.format(items[i].price), items[i].quantityOrEnchantStr, items[i].time));
-
-
-            }
+            } catch (NullPointerException ignored){}
         }
       return(res);
     }
