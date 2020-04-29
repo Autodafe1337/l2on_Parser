@@ -4,6 +4,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 import java.io.IOException;
+import java.net.ConnectException;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -59,14 +60,19 @@ public class Items {
                     .post();
 
             name = doc.select("h1").textNodes().get(0).text();
-            if(!doc.select("h1").select("span").isEmpty()){
+            if(!doc.select("h1").select("span").isEmpty()&&doc.select("h1").select("span").size()==2){
                 name +=doc.select("h1").select("span").eq(0).text();
             }
 
 
             enchant = -1;
-        } catch (
-                IOException e) {
+        } catch (ConnectException e){
+            try {
+                Thread.sleep(300000);
+            } catch (InterruptedException ex) {
+                ex.printStackTrace();
+            }
+        } catch (IOException e) {
             e.printStackTrace();
         }
         myFormat = NumberFormat.getInstance();
@@ -93,9 +99,9 @@ public class Items {
         }
 
         if(lowestPrice != 2147000000) {
-
-            System.out.println(String.format("Продажа: %s - %s Аден%s - %s", newName, myFormat.format(lowestPrice), lowestQuantity, lowestTime));
-            return (String.format("Продажа: %s - %s Аден%s - %s", name, myFormat.format(lowestPrice), lowestQuantity, lowestTime));
+            String res = String.format("Продажа: %s - %s Аден%s - %s", name, myFormat.format(lowestPrice), lowestQuantity, lowestTime);
+            System.out.println(res);
+            return (res);
         } else return("");
 
     }
@@ -198,12 +204,34 @@ public class Items {
                         newName = name + " +" + items[i].quantityOrEnchant;
                     }
 
-                    System.out.println(String.format("Демпинг: %s - %s Аден%s - %s", newName, myFormat.format(items[i].price), items[i].quantityOrEnchantStr, items[i].time));
-                    res.add(String.format("Демпинг: %s - %s Аден%s - %s", newName, myFormat.format(items[i].price), items[i].quantityOrEnchantStr, items[i].time));
+                    System.out.println(String.format("Демпинг продажи: %s - %s Аден%s - %s", newName, myFormat.format(items[i].price), items[i].quantityOrEnchantStr, items[i].time));
+                    res.add(String.format("Демпинг продажи: %s - %s Аден%s - %s", newName, myFormat.format(items[i].price), items[i].quantityOrEnchantStr, items[i].time));
                 }
             } catch (NullPointerException ignored){}
         }
       return(res);
+    }
+
+    public ArrayList<String> checkForMore(int minPrice){                        //проверяет есть ли товар дешевле
+
+        clearItems();
+        addItems("#group_buy");
+
+        ArrayList<String> res = new ArrayList<String>();
+        String newName = name;
+        for(int i = 0; i<len; i++){
+            try {
+                if (items[i].price > minPrice) {
+                    if (enchant == 1) {
+                        newName = name + " +" + items[i].quantityOrEnchant;
+                    }
+
+                    System.out.println(String.format("Демпинг покупки: %s - %s Аден%s - %s", newName, myFormat.format(items[i].price), items[i].quantityOrEnchantStr, items[i].time));
+                    res.add(String.format("Демпинг покупки: %s - %s Аден%s - %s", newName, myFormat.format(items[i].price), items[i].quantityOrEnchantStr, items[i].time));
+                }
+            } catch (NullPointerException ignored){}
+        }
+        return(res);
     }
 
     public class Item{

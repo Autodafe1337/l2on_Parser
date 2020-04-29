@@ -12,28 +12,30 @@ public class Main {
 
     public static void main(String[] args){
 
-
         NumberFormat myFormat = NumberFormat.getInstance();
         myFormat.setGroupingUsed(true);
 
         LocalTime time;
         CheckerGUI gui = new CheckerGUI("L2on Parser");
-        Items moon = new Items("92236", "Лунный");
-        Items korall = new Items("92196", "Коралл");
-        Items onyx = new Items("92206", "Оникс");
-        Items opal = new Items("92186", "Опал");
-        Items circon = new Items("92226", "Циркон");
-        Items ember = new Items("92176", "Янтарь");
-        Items shpinel = new Items("92216", "Шпинель");
-        Items L1000 = new Items("93628", "1000");
-        Items L8000 = new Items("93629", "8000");
-        int[] IDlist = {93633, 49996, 91169, 205,
+
+        int[] IDlist = {93633, 49996, 91169,
                 91170, 91166, 91167, 91168};
 
 
-
-//        gui.addText(korall.checkForLess(3900000));
         while(true) {
+
+            Items moon = new Items("92236", "Лунный");
+            Items korall = new Items("92196", "Коралл");
+            Items onyx = new Items("92206", "Оникс");
+            Items opal = new Items("92186", "Опал");
+            Items circon = new Items("92226", "Циркон");
+            Items ember = new Items("92176", "Янтарь");
+            Items shpinel = new Items("92216", "Шпинель");
+            Items L1000 = new Items("93628", "1000");
+            Items L8000 = new Items("93629", "8000");
+            Items eaa = new Items(730, "EAA");
+            Items dv = new Items(91967, "DV");
+            Items toi = new Items(91966, "ToI");
 
 //
 //        gui.addText(onyx.getLowestPrice());
@@ -53,18 +55,33 @@ public class Main {
             System.out.print("");         //buy sell all gems
 
 
-
-            gui.addText(onyx.checkForLess(10350000));
-            gui.addText(shpinel.checkForLess(8870000));
-            gui.addText(korall.checkForLess(6380000));
-            gui.addText(circon.checkForLess(6350000));
-//            gui.addText(opal.checkForLess(2450000));
-//            gui.addText(moon.checkForLess(2880000));
-//            gui.addText(ember.checkForLess(690000));
+//            gui.addText(eaa.checkForLess(2100000));
 
 
-            gui.addText(" ");
+            gui.addText(onyx.checkForLess(14800000));
+//            gui.addText(shpinel.checkForLess(13800000));
+            gui.addText(korall.checkForLess(7500000));
+            gui.addText(circon.checkForLess(7250000));
+            gui.addText(opal.checkForLess(4750000));
+            gui.addText(dv.checkForLess(1150000));
+            gui.addText(toi.checkForLess(790000));
+//            gui.addText(moon.checkForLess(5000000));
+//            gui.addText(ember.checkForLess(370000));
+
+            if(!gui.textArea.getText().isEmpty()){
+                gui.addText(" ");
+            }
             System.out.println("");
+
+            gui.addText(dv.checkForMore(420000));
+            gui.addText(toi.checkForMore(320000));
+            gui.addText(L8000.checkForMore(69800000));
+
+            if(!gui.textArea.getText().isEmpty()){
+                gui.addText(" ");
+            }
+            System.out.println("");
+
             gui.addText(checkList(IDlist));
 //        System.out.println("");
         System.out.println("");
